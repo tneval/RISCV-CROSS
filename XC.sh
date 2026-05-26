@@ -12,7 +12,12 @@ export CC=clang
 export CXX=clang++
 
 CROSSCHAIN=$(pwd)/sources/riscv64-unknown-linux-gnu
+
+# All sources are put here
 mkdir -p sources
+
+# When compiled, compressed tarballs are put here
+mkdir -p tarballs
 
 cmd=$1
 
@@ -41,6 +46,9 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 EOF
         exit 1
         ;;
+
+
+    #### Cross-compiler
     build-llvm-xc)
         if [ ! -d "sources/llvm-project" ]; then
 
@@ -49,7 +57,9 @@ EOF
             git -C sources/llvm-project fetch --depth=1 origin tag llvmorg-22.1.6
             git -C sources/llvm-project checkout llvmorg-22.1.6
 
-
+            git clone https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git sources/llvm-project/llvm/projects
+            git -C sources/llvm-project/llvm/projects/SPIRV-LLVM-Translator checkout llvm_release_220
+            exit 1
 
         else
             echo "repository already exists, skipping clone"
@@ -71,9 +81,11 @@ EOF
         exit 1
         ;;
 
+
+    #### RISCV-native upstream LLVM
     build-llvm-riscv)
 
-        if [ ! -d "build/llvm-cc" ]; then
+        if [ -d "build/llvm-cc" ]; then
 
             cmake -G "Ninja" -B build/llvm-riscv \
                 -DCMAKE_BUILD_TYPE=Release \
@@ -86,7 +98,6 @@ EOF
                 -DLLVM_DEFAULT_TARGET_TRIPLE=riscv64-linux-gnu \
                 -DLLVM_BUILD_LLVM_DYLIB=ON \
                 -DLLVM_LINK_LLVM_DYLIB=ON \
-                -DLLVM_APPEND_VC_REVISION=OFF \
                 -DLLVM_TARGET_ARCH=riscv64 \
                 -DCMAKE_SYSTEM_NAME=Linux \
                 -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
