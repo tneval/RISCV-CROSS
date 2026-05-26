@@ -166,6 +166,7 @@ EOF
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CROSSCOMPILING=ON \
             -DWITH_LLVM_CONFIG=$(pwd)/build/llvm-cc/bin/llvm-config \
+            -DLLVM_DIR=$(pwd)/install/llvm-riscv/lib/cmake/llvm \
             -DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
             -DCMAKE_CXX_COMPILER=$(pwd)/build/llvm-cc/bin/clang++ \
             -DCMAKE_INSTALL_PREFIX=$(pwd)/install/pocl-lvn \
