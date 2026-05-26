@@ -91,6 +91,8 @@ EOF
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_CROSSCOMPILING=ON \
                 -DLLVM_DIR=$(pwd)/build/llvm-cc/lib/cmake/llvm \
+                -DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
+                -DCMAKE_CXX_COMPILER=$(pwd)/build/llvm-cc/bin/clang++ \
                 -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-riscv \
                 -DLLVM_NATIVE_TOOL_DIR=$(pwd)/build/llvm-cc/bin \
 		-DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
@@ -109,18 +111,52 @@ EOF
                 -DLLVM_ENABLE_PROJECTS="clang" \
                 sources/llvm-project/llvm
                 (cd build/llvm-riscv/ && ninja install)
+
+                tar -czf tarballs/LLVM22-RISCV.tar.gz install/llvm-riscv
         else
             echo "cross-compiler does not exist"
         fi
         exit 0
-	;;
+        ;;
 
+    #### RISCV-native  LLVM-epils
     build-llvm-epi)
-        if [ -d "build/llvm-cc" ] && [ -d "sources/llvm-project" ]; then
+        if [ ! -d "sources/llvm-epi" ]; then
             git clone ssh://git@git.dare.megware.com:2221/compilers/llvm-project.git sources/llvm-epi
         fi
 
-        exit 1
+        if [ -d "build/llvm-cc" ] && [ -d "sources/llvm-project" ]; then
+            cmake -G "Ninja" -B build/llvm-epi-riscv \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_CROSSCOMPILING=ON \
+                -DLLVM_DIR=$(pwd)/build/llvm-cc/lib/cmake/llvm \
+                -DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
+                -DCMAKE_CXX_COMPILER=$(pwd)/build/llvm-cc/bin/clang++ \
+                -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-epi-riscv \
+                -DLLVM_NATIVE_TOOL_DIR=$(pwd)/build/llvm-cc/bin \
+                -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+                -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+                -DLLVM_HOST_TRIPLE=riscv64-unknown-linux-gnu \
+                -DLLVM_DEFAULT_TARGET_TRIPLE=riscv64-linux-gnu \
+                -DLLVM_BUILD_LLVM_DYLIB=ON \
+                -DLLVM_LINK_LLVM_DYLIB=ON \
+                -DLLVM_TARGET_ARCH=riscv64 \
+                -DCMAKE_SYSTEM_NAME=Linux \
+                -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+                -DLLVM_ENABLE_ASSERTIONS=ON \
+                -DLLVM_TARGETS_TO_BUILD="RISCV;SPIRV" \
+                -DLLVM_ENABLE_PROJECTS="clang" \
+                sources/llvm-epi/llvm
+                (cd build/llvm-epi-riscv/ && ninja install)
+
+                tar -czf tarballs/LLVM-EPI-RISCV.tar.gz install/llvm-epi-riscv
+        fi
+
+        exit 0
+        ;;
+    pocl-lvn)
+        git clone git@github.com:pocl/unpublished.git sources/pocl-lvn
+        exit 0
         ;;
 
     *)
@@ -130,23 +166,3 @@ EOF
 esac
 
 
-cmake -G "Ninja" -B build/llvm-epi-riscv \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_CROSSCOMPILING=ON \
-  -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-epi-riscv \
-  -DLLVM_NATIVE_TOOL_DIR=$(pwd)/build/llvm-epi-x86/bin \
-  -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
-  -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
-  -DLLVM_HOST_TRIPLE=riscv64-unknown-linux-gnu \
-  -DLLVM_DEFAULT_TARGET_TRIPLE=riscv64-linux-gnu \
-  -DLLVM_BUILD_LLVM_DYLIB=ON \
-  -DLLVM_LINK_LLVM_DYLIB=ON \
-  -DLLVM_APPEND_VC_REVISION=OFF \
-  -DLLVM_TARGET_ARCH=riscv64 \
-  -DCMAKE_SYSTEM_NAME=Linux \
-  -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
-  -DLLVM_ENABLE_ASSERTIONS=ON \
-  -DLLVM_TARGETS_TO_BUILD="RISCV;SPIRV" \
-  -DLLVM_ENABLE_PROJECTS="clang" \
-  sources/llvm-project/llvm
-(cd build/llvm-epi-riscv/ && ninja install)
