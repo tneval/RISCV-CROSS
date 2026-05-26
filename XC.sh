@@ -49,6 +49,13 @@ EOF
             git -C sources/llvm-project fetch --depth=1 origin tag llvmorg-22.1.6
             git -C sources/llvm-project checkout llvmorg-22.1.6
 
+
+
+        else
+            echo "repository already exists, skipping clone"
+        fi
+
+        if [ ! -d "build/llvm-cc" ]; then
             cmake -G "Ninja" -B build/llvm-cc \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-cc \
@@ -57,9 +64,8 @@ EOF
                 -DLLVM_ENABLE_PROJECTS="clang" \
                 sources/llvm-project/llvm
                 (cd build/llvm-cc/ && ninja)
-
         else
-            echo "cross-compiler already exists, skipping build"
+             echo "cross-compiler already exists, skipping build"
         fi
 
         exit 1
