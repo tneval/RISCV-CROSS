@@ -25,7 +25,6 @@ case "$cmd" in
     init)
         wget -O sources/riscv64-unknown-linux-gnu.tar.bz2 https://admin.hca.bsc.es/epi/ftp/GNU/bin/riscv64-unknown-linux-gnu.tar.bz2
         tar -jxf sources/riscv64-unknown-linux-gnu.tar.bz2 -C sources
-        echo "initti"
 
         mkdir -p build
 
@@ -44,7 +43,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 EOF
-        exit 1
+        exit 0
         ;;
 
 
@@ -57,7 +56,7 @@ EOF
             git -C sources/llvm-project fetch --depth=1 origin tag llvmorg-22.1.6
             git -C sources/llvm-project checkout llvmorg-22.1.6
 
-            git clone https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git sources/llvm-project/llvm/projects
+            git clone https://github.com/KhronosGroup/SPIRV-LLVM-Translator.git sources/llvm-project/llvm/projects/SPIRV-LLVM-Translator
             git -C sources/llvm-project/llvm/projects/SPIRV-LLVM-Translator checkout llvm_release_220
             exit 1
 
@@ -78,18 +77,19 @@ EOF
              echo "cross-compiler already exists, skipping build"
         fi
 
-        exit 1
+        exit 0
         ;;
 
 
     #### RISCV-native upstream LLVM
     build-llvm-riscv)
 
-        if [ -d "build/llvm-cc" ]; then
+        if [ -d "build/llvm-cc" ] && [ -d "sources/llvm-project" ]; then
 
             cmake -G "Ninja" -B build/llvm-riscv \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_CROSSCOMPILING=ON \
+                -DLLVM_DIR=build/llvm-cc/lib/llvm/cmake \
                 -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-riscv \
                 -DLLVM_NATIVE_TOOL_DIR=$(pwd)/build/llvm-cc/bin \
                 -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
@@ -109,6 +109,13 @@ EOF
         else
             echo "cross-compiler does not exist"
         fi
+        exit 0
+
+    build-llvm-epi)
+        if [ -d "build/llvm-cc" ] && [ -d "sources/llvm-project" ]; then
+            git clone ssh://git@git.dare.megware.com:2221/compilers/llvm-project.git sources/llvm-epi
+        fi
+
         exit 1
         ;;
 
