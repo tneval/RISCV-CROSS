@@ -165,7 +165,7 @@ EOF
             cmake -G Ninja -B build/pocl-lvn \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CROSSCOMPILING=ON \
-            -DWITH_LLVM_CONFIG=$(pwd)/install/llvm-riscv/bin/llvm-config \
+            -DWITH_LLVM_CONFIG=$(pwd)/build/llvm-cc/bin/llvm-config \
             -DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
             -DCMAKE_CXX_COMPILER=$(pwd)/build/llvm-cc/bin/clang++ \
             -DCMAKE_INSTALL_PREFIX=$(pwd)/install/pocl-lvn \
