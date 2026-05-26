@@ -1,6 +1,13 @@
 #!/bin/bash
+
+# USAGE:
+# ./XC.sh init              - to fetch the RISCV toolchain and setup cmake-cross file
+# ./XC.sh build-llvm-xc     - to build the cross-compiler
+# ./XC.sh build-llvm-riscv  - to build RISC-V native LLVM
+
 set -e
 
+# Modify compilers if needed (e.g. clang-20)
 export CC=clang
 export CXX=clang++
 
@@ -34,7 +41,7 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 EOF
         exit 1
         ;;
-    build-XC)
+    build-llvm-xc)
         if [ ! -d "sources/llvm-project" ]; then
 
             # Modify the tag as needed
@@ -42,19 +49,49 @@ EOF
             git -C sources/llvm-project fetch --depth=1 origin tag llvmorg-22.1.6
             git -C sources/llvm-project checkout llvmorg-22.1.6
 
-            cmake -G "Ninja" -B build/llvm-RISCV-cc \
+            cmake -G "Ninja" -B build/llvm-cc \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-RISCV-cc \
+                -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-cc \
                 -DLLVM_ENABLE_ASSERTIONS=ON \
                 -DLLVM_TARGETS_TO_BUILD="RISCV" \
                 -DLLVM_ENABLE_PROJECTS="clang" \
                 sources/llvm-project/llvm
-                (cd build/llvm-RISCV-cc/ && ninja)
+                (cd build/llvm-cc/ && ninja)
 
         else
             echo "cross-compiler already exists, skipping build"
         fi
 
+        exit 1
+        ;;
+
+    build-llvm-riscv)
+
+        if [ ! -d "build/llvm-cc" ]; then
+
+            cmake -G "Ninja" -B build/llvm-riscv \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DCMAKE_CROSSCOMPILING=ON \
+                -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-riscv \
+                -DLLVM_NATIVE_TOOL_DIR=$(pwd)/build/llvm-cc/bin \
+                -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+                -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+                -DLLVM_HOST_TRIPLE=riscv64-unknown-linux-gnu \
+                -DLLVM_DEFAULT_TARGET_TRIPLE=riscv64-linux-gnu \
+                -DLLVM_BUILD_LLVM_DYLIB=ON \
+                -DLLVM_LINK_LLVM_DYLIB=ON \
+                -DLLVM_APPEND_VC_REVISION=OFF \
+                -DLLVM_TARGET_ARCH=riscv64 \
+                -DCMAKE_SYSTEM_NAME=Linux \
+                -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+                -DLLVM_ENABLE_ASSERTIONS=ON \
+                -DLLVM_TARGETS_TO_BUILD="RISCV;SPIRV" \
+                -DLLVM_ENABLE_PROJECTS="clang" \
+                sources/llvm-project/llvm
+                (cd build/llvm-riscv/ && ninja install)
+        else
+            echo "cross-compiler does not exist"
+        fi
         exit 1
         ;;
 
