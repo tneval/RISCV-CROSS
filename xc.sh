@@ -85,13 +85,16 @@ EOF
     build-llvm-riscv)
 
         if [ -d "build/llvm-cc" ] && [ -d "sources/llvm-project" ]; then
-
+	   unset CC
+	   unset CXX
             cmake -G "Ninja" -B build/llvm-riscv \
                 -DCMAKE_BUILD_TYPE=Release \
                 -DCMAKE_CROSSCOMPILING=ON \
-                -DLLVM_DIR=build/llvm-cc/lib/llvm/cmake \
+                -DLLVM_DIR=$(pwd)/build/llvm-cc/lib/cmake/llvm \
                 -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-riscv \
                 -DLLVM_NATIVE_TOOL_DIR=$(pwd)/build/llvm-cc/bin \
+		-DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
+                -DCMAKE_CXX_COMPILER=$(pwd)/build/llvm-cc/bin/clang++ \
                 -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
                 -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
                 -DLLVM_HOST_TRIPLE=riscv64-unknown-linux-gnu \
@@ -110,6 +113,7 @@ EOF
             echo "cross-compiler does not exist"
         fi
         exit 0
+	;;
 
     build-llvm-epi)
         if [ -d "build/llvm-cc" ] && [ -d "sources/llvm-project" ]; then
