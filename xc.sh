@@ -165,7 +165,7 @@ EOF
             cmake -G Ninja -B build/pocl-lvn \
             -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_CROSSCOMPILING=ON \
-            -DWITH_LLVM_CONFIG=$(pwd)/install/llvm-riscv/bin/llvm-config
+            -DWITH_LLVM_CONFIG=$(pwd)/install/llvm-riscv/bin/llvm-config \
             -DCMAKE_C_COMPILER=$(pwd)/build/llvm-cc/bin/clang \
             -DCMAKE_CXX_COMPILER=$(pwd)/build/llvm-cc/bin/clang++ \
             -DCMAKE_INSTALL_PREFIX=$(pwd)/install/pocl-lvn \
@@ -173,6 +173,8 @@ EOF
             -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
             -DCMAKE_SYSTEM_NAME=Linux \
             -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+            -DCMAKE_INSTALL_RPATH="\$ORIGIN/../../llvm-riscv/lib" \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
             sources/pocl-lvn
             (cd build/pocl-lvn/ && ninja install)
 
