@@ -36,16 +36,20 @@ EOF
         ;;
     build-XC)
         if [ ! -d "sources/llvm-project" ]; then
-            git clone --depth=1 https://github.com/llvm/llvm-project.git sources/llvm-project
 
-            cmake -G "Ninja" -B build/llvm-x86-CC \
+            # Modify the tag as needed
+            git clone --depth=1 https://github.com/llvm/llvm-project.git sources/llvm-project
+            git -C sources/llvm-project fetch --depth=1 origin tag llvmorg-22.1.6
+            git -C sources/llvm-project checkout llvmorg-22.1.6
+
+            cmake -G "Ninja" -B build/llvm-RISCV-cc \
                 -DCMAKE_BUILD_TYPE=Release \
-                -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-x86-CC \
+                -DCMAKE_INSTALL_PREFIX=$(pwd)/install/llvm-RISCV-cc \
                 -DLLVM_ENABLE_ASSERTIONS=ON \
                 -DLLVM_TARGETS_TO_BUILD="RISCV" \
                 -DLLVM_ENABLE_PROJECTS="clang" \
                 sources/llvm-project/llvm
-                (cd build/llvm-x86-CC/ && ninja)
+                (cd build/llvm-RISCV-cc/ && ninja)
 
         else
             echo "cross-compiler already exists, skipping build"
