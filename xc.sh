@@ -189,6 +189,42 @@ EOF
         exit 0
         ;;
 
+    pocl-lvn2)
+
+        if [ ! -d "sources/llvm-epi" ]; then
+            git clone git@github.com:pocl/unpublished.git sources/pocl-lvn
+        fi
+
+        if [ -d "build/llvm-cc" ]; then
+
+            cmake -G Ninja -B build/pocl-lvn \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_CROSSCOMPILING=ON \
+            -DWITH_LLVM_CONFIG=$(pwd)/build/llvm-cc/bin/llvm-config \
+            -DLLVM_DIR=$(pwd)/install/llvm-riscv/lib/cmake/llvm \
+            -DLLC_HOST_CPU="spacemit-x60"\
+            -DCMAKE_C_COMPILER=$(pwd)/sources/riscv64-unknown-linux-gnu/bin/riscv64-unknown-linux-gnu-gcc \
+            -DCMAKE_CXX_COMPILER=$(pwd)/sources/riscv64-unknown-linux-gnu/bin/riscv64-unknown-linux-gnu-g++ \
+            -DCMAKE_INSTALL_PREFIX=$(pwd)/install/pocl-lvn \
+            -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+            -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+            -DCMAKE_SYSTEM_NAME=Linux \
+            -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
+            -DCMAKE_INSTALL_RPATH="\$ORIGIN/../../llvm-riscv/lib" \
+            -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON \
+            sources/pocl-lvn
+            (cd build/pocl-lvn/ && ninja install)
+
+            tar -czf tarballs/pocl-lvn.tar.gz install/pocl-lvn
+        else
+            echo "cross-compiler does not exist"
+        fi
+
+
+        exit 0
+        ;;
+
+
     *)
         echo "incorrect usage"
         exit 1
