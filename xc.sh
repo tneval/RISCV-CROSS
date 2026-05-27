@@ -191,6 +191,9 @@ EOF
 
     pocl-lvn2)
 
+        unset CC
+        unset CXX
+
         if [ ! -d "sources/llvm-epi" ]; then
             git clone git@github.com:pocl/unpublished.git sources/pocl-lvn
         fi
@@ -206,8 +209,8 @@ EOF
             -DCMAKE_C_COMPILER=$(pwd)/sources/riscv64-unknown-linux-gnu/bin/riscv64-unknown-linux-gnu-gcc \
             -DCMAKE_CXX_COMPILER=$(pwd)/sources/riscv64-unknown-linux-gnu/bin/riscv64-unknown-linux-gnu-g++ \
             -DCMAKE_INSTALL_PREFIX=$(pwd)/install/pocl-lvn \
-            -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
-            -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64imafdcv_zicbom_zicboz_zicntr_zicond_zicsr_zifencei_zihintpause_zihpm_zfh_zfhmin_zca_zcd_zba_zbb_zbc_zbs_zkt_zve32f_zve32x_zve64d_zve64f_zve64x_zvfh_zvfhmin_zvkt_sscofpmf_sstc_svinval_svnapot_svpbmt" \
+            -DCMAKE_C_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64gc" \
+            -DCMAKE_CXX_FLAGS="--sysroot=$CROSSCHAIN/riscv64-unknown-linux-gnu/sysroot/ --gcc-toolchain=$CROSSCHAIN -target riscv64-unknown-linux-gnu -Os -mabi=lp64d -march=rv64gc" \
             -DCMAKE_SYSTEM_NAME=Linux \
             -DCMAKE_SYSTEM_PROCESSOR=riscv64 \
             -DCMAKE_INSTALL_RPATH="\$ORIGIN/../../llvm-riscv/lib" \
