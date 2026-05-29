@@ -10,11 +10,15 @@
 #    This will compile the kernel library (LLVM bitcode), but cmake tests that it supports RISC-V target.
 # 3. RISC-V native LLVM that PoCL get linked to.
 
-LLVM_TAG="llvmorg-22.1.6"
+
+# Variables
+#############################################
+LLVM_VERSION="22.1.6"
 LLVM_SPIRV_BRANCH="llvm_release_220"
+#############################################
 
-D_NAME=llvm-x86-with-riscv-target
-
+LLVM_TAG="llvmorg-${LLVM_VERSION}"
+D_NAME="llvm-x86-with-riscv-target-${LLVM_VERSION}"
 
 set -e
 
@@ -41,7 +45,7 @@ if [ ! -d "build/${D_NAME}" ]; then
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=$(pwd)/install/${D_NAME} \
         -DLLVM_ENABLE_ASSERTIONS=ON \
-        -DLLVM_TARGETS_TO_BUILD="X86;RISCV" \
+        -DLLVM_TARGETS_TO_BUILD="RISCV" \
         -DLLVM_ENABLE_PROJECTS="clang" \
         -DLLVM_BUILD_LLVM_DYLIB=ON \
         -DLLVM_LINK_LLVM_DYLIB=ON \

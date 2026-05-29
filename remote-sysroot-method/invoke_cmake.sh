@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Variables:
 ###########################################################
 # Choose PoCL repository
@@ -7,7 +9,7 @@ POCL_REPO="git@github.com:pocl/unpublished.git"
 
 # the root filesystem of the board
 # Local or over remote?
-TARGET_ROOT=/home/tapio/SSHFS-mountpoint/neptune/
+TARGET_ROOT=/home/tapio/SSHFS-mountpoint/neptune
 
 # the location of Target LLVM inside the TARGET_ROOT
 TARGET_LLVM_INSTALL_DIR=/opt/LLVM_22_SPIRV/lib/cmake/llvm
@@ -16,9 +18,9 @@ TARGET_LLVM_LIB_RPATH=/opt/LLVM_22_SPIRV/lib
 
 ###########################################################
 
-BASE_DIR="$(pwd)/../"
+BASE_DIR="$(pwd)/.."
 
-SOURCE_DIR=${BASE_DIR}/sources/pocl-unpublished-wts/
+SOURCE_DIR=${BASE_DIR}/sources/pocl-unpublished-wts
 
 INSTALL_DIR=${BASE_DIR}/install/pocl-test
 
@@ -37,6 +39,7 @@ mkdir -p "${SOURCE_DIR}"
 # Controls branch in PoCL repo
 BRANCH=$1
 
+# Using worktrees instead of checking out branches
 case "$BRANCH" in
       # Loopvec-next
       lvn)
