@@ -25,7 +25,7 @@ SOURCE_DIR=${BASE_DIR}/sources/pocl-unpublished-wts
 INSTALL_DIR=${BASE_DIR}/install/pocl-test
 
 # host-side LLVM
-HOST_LLVM_CONFIG="$(pwd)/../install/llvm-x86-with-riscv-target/bin/llvm-config"
+HOST_LLVM_CONFIG="$(pwd)/../install/llvm-x86-with-riscv-target-22.1.6/bin/llvm-config"
 
 # Target settings
 TARGET_TRIPLE=riscv64-unknown-linux-gnu

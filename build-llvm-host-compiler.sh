@@ -39,7 +39,7 @@ else
     echo "repository already exists, skipping clone"
 fi
 
-
+# Build with libxml2 disabled as it is not uncommon to have version mismatch.
 if [ ! -d "build/${D_NAME}" ]; then
     cmake -G "Ninja" -B build/${D_NAME} \
         -DCMAKE_BUILD_TYPE=Release \
@@ -49,6 +49,7 @@ if [ ! -d "build/${D_NAME}" ]; then
         -DLLVM_ENABLE_PROJECTS="clang" \
         -DLLVM_BUILD_LLVM_DYLIB=ON \
         -DLLVM_LINK_LLVM_DYLIB=ON \
+        -DLLVM_ENABLE_LIBXML2=OFF \
         sources/llvm-project/llvm
         (cd build/${D_NAME}/ && ninja install)
 else
@@ -57,6 +58,7 @@ fi
 
 
 # In case this will be used on another machine.
-if [ ! -f "tarballs/${D_NAME}_${LLVM_TAG}.tar.gz" ]; then
-    tar -czf "tarballs/${D_NAME}_${LLVM_TAG}.tar.gz" "install/${D_NAME}"
+if [ ! -f "tarballs/${D_NAME}.tar.gz" ]; then
+    tar -czf "tarballs/${D_NAME}.tar.gz" "install/${D_NAME}"
+    echo "Compressed to: ${D_NAME}.tar.gz"
 fi
